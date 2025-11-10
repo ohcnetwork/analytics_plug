@@ -89,7 +89,7 @@ class AnalyticsViewSet(
 
     def authorize_create(self, instance):
         if not self.request.user.is_superuser:
-            raise PermissionDeniedError(
+            raise PermissionDenied(
                 "You are not authorized to create analytics configs"
             )
         return super().authorize_create(instance)
