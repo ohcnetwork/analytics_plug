@@ -9,6 +9,7 @@ from care.emr.resources.base import EMRResource
 
 class AnalyticsContexts(str, Enum):
     facility = "facility"
+    organization = "organization"
 
 
 class BaseAnalyticsResource(EMRResource):

@@ -17,7 +17,7 @@ from care.emr.api.viewsets.base import (
     EMRRetrieveMixin,
     EMRUpdateMixin,
 )
-from care.emr.models.organization import FacilityOrganizationUser
+from care.emr.models.organization import FacilityOrganizationUser, Organization, OrganizationUser
 from care.facility.models.facility import Facility
 from care.utils.shortcuts import get_object_or_404
 
@@ -25,6 +25,8 @@ from care.utils.shortcuts import get_object_or_404
 def get_context_object(user, instance, external_id):
     if instance.context_type == AnalyticsContexts.facility.value:
         return get_object_or_404(Facility, external_id=external_id)
+    elif instance.context_type == AnalyticsContexts.organization.value:
+        return get_object_or_404(Organization, external_id=external_id)
     return None
 
 
@@ -38,6 +40,13 @@ def authorize_analytics_config(user, instance, obj):
         ).exists()
     ):
         raise PermissionDenied("You are not authorized to access this analytics config")
+    elif (
+        instance.context_type == AnalyticsContexts.organization.value
+        and not OrganizationUser.objects.filter(
+            user=user, organization=obj
+        ).exists()
+    ):
+        raise PermissionDenied("You are not authorized to access this analytics config")
 
 
 def get_context(user, instance, obj):
@@ -45,6 +54,9 @@ def get_context(user, instance, obj):
     if instance.context_type == AnalyticsContexts.facility.value:
         context["facility_external_id"] = str(obj.external_id)
         context["facility_id"] = str(obj.id)
+    elif instance.context_type == AnalyticsContexts.organization.value:
+        context["organization_external_id"] = str(obj.external_id)
+        context["organization_id"] = str(obj.id)
     return context
 
 
