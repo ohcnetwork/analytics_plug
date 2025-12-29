@@ -80,6 +80,7 @@ class GenerateAnalyticsUrlRequest(BaseModel):
 
 class AnalyticsFilters(filters.FilterSet):
     name = filters.CharFilter(lookup_expr="icontains")
+    context_type = filters.CharFilter(lookup_expr="exact")
 
 
 class AnalyticsViewSet(
