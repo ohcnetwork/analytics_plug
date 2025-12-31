@@ -42,7 +42,7 @@ def authorize_analytics_config(user, instance, obj):
         raise PermissionDenied("You are not authorized to access this analytics config")
     elif (instance.context_type == AnalyticsContexts.organization.value
         and not OrganizationUser.objects.filter(
-            user=user).filter(Q(organization__parent_cache__overlap=[obj.id]) | Q(organization=obj)).exists()):
+            user=user, organization_id__in=[*obj.parent_cache, obj.id]).exists()):
         raise PermissionDenied("You are not authorized to access this analytics config")
 
 
