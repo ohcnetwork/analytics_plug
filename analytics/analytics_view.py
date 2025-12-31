@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
-
+from django.db.models import Q
 from analytics.models import AnalyticsConfig
 from analytics.registry import AnalyticsHandlerRegistry
 from analytics.resources import AnalyticsContexts, BaseAnalyticsResource
@@ -40,12 +40,9 @@ def authorize_analytics_config(user, instance, obj):
         ).exists()
     ):
         raise PermissionDenied("You are not authorized to access this analytics config")
-    elif (
-        instance.context_type == AnalyticsContexts.organization.value
+    elif (instance.context_type == AnalyticsContexts.organization.value
         and not OrganizationUser.objects.filter(
-            user=user, organization=obj
-        ).exists()
-    ):
+            user=user).filter(Q(organization__parent_cache__overlap=[obj.id]) | Q(organization=obj)).exists()):
         raise PermissionDenied("You are not authorized to access this analytics config")
 
 
